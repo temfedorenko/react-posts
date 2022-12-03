@@ -1,25 +1,143 @@
-import logo from './logo.svg';
-import './App.css';
+import "bulma/bulma.sass";
+import "@fortawesome/fontawesome-free/css/all.css";
+import { useEffect, useState } from "react";
+import classNames from "classnames";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+import "./App.scss";
+
+// import classNames from "classnames";
+import { PostsList } from "./components/PostsList";
+import { PostDetails } from "./components/PostDetails";
+import { UserSelector } from "./components/UserSelector";
+import { Loader } from "./components/Loader";
+
+import { client } from "./utils/fetchClient";
+
+const App = () => {
+  // Users
+  const [users, setUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState();
+  // Posts
+  const [posts, setPosts] = useState([]);
+  const [selectedPost, setSelectedPost] = useState();
+  const [selectedPostId, setSelectedPostId] = useState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  // Comments
+  const [comments, setComments] = useState([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsError, setCommentsError] = useState(false);
+
+  const [isMenuActive, setIsMenuActive] = useState(false);
+
+  useEffect(() => {
+    client
+      .get("/users")
+      .then((data) => setUsers(data.slice(3, 10)))
+      .catch((err) => console.log(err));
+  }, []);
+
+  useEffect(() => {
+    if (selectedUserId) {
+      client
+        .get("/posts")
+        .then((data) => setPosts(data.filter((post) => post.userId === selectedUserId)))
+        .catch(() => setError(true))
+        .finally(() => setLoading(false));
+    }
+  }, [selectedUserId]);
+
+  useEffect(() => {
+    if (selectedPostId) {
+      client
+        .get("/comments")
+        .then((data) => setComments(data.filter((comment) => comment.postId === selectedPostId)))
+        .catch(() => setCommentsError(true))
+        .finally(() => setCommentsLoading(false));
+    }
+  }, [selectedPostId]);
+
+  function onToggleMenu() {
+    setIsMenuActive((isMenuActive) => !isMenuActive);
+  }
+
+  function handleUserSelect(id) {
+    setSelectedUserId(id);
+    setLoading(true);
+    setError(false);
+    setIsMenuActive(false);
+  }
+
+  function handlePostSelect(id, post) {
+    setCommentsLoading(true);
+    setCommentsError(false);
+    setSelectedPostId(id);
+    setSelectedPost(post);
+  }
+
+  const errorMessage = error && (
+    <div className="notification is-danger" data-cy="PostsLoadingError">
+      Something went wrong!
     </div>
   );
-}
+
+  const noPostsMessage = posts.length === 0 && !loading && !error && selectedUserId && (
+    <div className="notification is-warning" data-cy="NoPostsYet">
+      No posts yet
+    </div>
+  );
+
+  const content = loading ? (
+    <Loader />
+  ) : (
+    posts.length > 0 && (
+      <PostsList userPosts={posts} onPostSelect={handlePostSelect} selectedPost={selectedPost} />
+    )
+  );
+
+  return (
+    <main className="section">
+      <div className="container">
+        <div className="tile is-ancestor">
+          <div className="tile is-parent">
+            <div className="tile is-child box is-success">
+              <div className="block">
+                <UserSelector
+                  users={users}
+                  onToggleMenu={onToggleMenu}
+                  isMenuActive={isMenuActive}
+                  onUserSelect={handleUserSelect}
+                  selectedUserId={selectedUserId}
+                />
+              </div>
+
+              <div className="block">
+                {!selectedUserId && <p>No user selected</p>}
+                {errorMessage}
+                {noPostsMessage}
+                {content}
+              </div>
+            </div>
+          </div>
+
+          <div
+            data-cy="Sidebar"
+            className={classNames("tile", "is-parent", "is-8-desktop", "Sidebar", {
+              "Sidebar--open": selectedPost,
+            })}>
+            <div className="tile is-child box is-success ">
+              <PostDetails
+                post={selectedPost}
+                comments={comments}
+                commentsLoading={commentsLoading}
+                commentsError={commentsError}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
 
 export default App;
