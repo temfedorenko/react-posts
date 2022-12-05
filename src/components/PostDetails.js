@@ -1,54 +1,53 @@
+import { useState } from "react";
 import { Loader } from "./Loader";
 import { NewCommentForm } from "./NewCommentForm";
 
-export const PostDetails = ({ post, comments, commentsLoading, commentsError }) => {
+export const PostDetails = ({
+  post,
+  comments,
+  commentsLoading,
+  commentsError,
+  onFormSubmit,
+  selectedPostId,
+  addComment,
+  setIsFormVisible,
+  isFormVisible,
+}) => {
   const postComments = comments?.map((comment) => {
     return (
-      <article className="message is-small" data-cy="Comment" key={comment.id}>
+      <article className="message is-small" key={comment.id}>
         <div className="message-header">
-          <a href={`mailto:${comment.email}`} data-cy="CommentAuthor">
-            {comment.name}
-          </a>
-          <button
-            data-cy="CommentDelete"
-            type="button"
-            className="delete is-small"
-            aria-label="delete">
+          <a href={`mailto:${comment.email}`}>{comment.name}</a>
+          <button type="button" className="delete is-small" aria-label="delete">
             delete button
           </button>
         </div>
 
-        <div className="message-body" data-cy="CommentBody">
-          {comment.body}
-        </div>
+        <div className="message-body">{comment.body}</div>
       </article>
     );
   });
 
   const errorMessage = commentsError && (
-    <div className="notification is-danger" data-cy="CommentsError">
-      Something went wrong
-    </div>
+    <div className="notification is-danger">Something went wrong</div>
   );
 
   return (
-    <div className="content" data-cy="PostDetails">
-      <div className="content" data-cy="PostDetails">
+    <div className="content">
+      <div className="content">
         <div className="block">
-          <h2 data-cy="PostTitle">
+          <h2>
             {post?.id}: {post?.title}
           </h2>
 
-          <p data-cy="PostBody">{post?.body}</p>
+          <p>{post?.body}</p>
         </div>
 
         <div className="block">
           {errorMessage}
 
           {comments.length === 0 && !commentsLoading && !commentsError && (
-            <p className="title is-4" data-cy="NoCommentsMessage">
-              No comments yet
-            </p>
+            <p className="title is-4">No comments yet</p>
           )}
 
           {commentsLoading ? (
@@ -62,12 +61,20 @@ export const PostDetails = ({ post, comments, commentsLoading, commentsError }) 
             )
           )}
 
-          <button data-cy="WriteCommentButton" type="button" className="button is-link">
-            Write a comment
-          </button>
+          {!isFormVisible && (
+            <button type="button" className="button is-link" onClick={() => setIsFormVisible(true)}>
+              Write a comment
+            </button>
+          )}
         </div>
 
-        {/* <NewCommentForm /> */}
+        {isFormVisible && (
+          <NewCommentForm
+            onFormSubmit={onFormSubmit}
+            selectedPostId={selectedPostId}
+            addComment={addComment}
+          />
+        )}
       </div>
     </div>
   );

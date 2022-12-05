@@ -30,6 +30,8 @@ const App = () => {
 
   const [isMenuActive, setIsMenuActive] = useState(false);
 
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
   useEffect(() => {
     client
       .get("/users")
@@ -55,17 +57,24 @@ const App = () => {
         .catch(() => setCommentsError(true))
         .finally(() => setCommentsLoading(false));
     }
-  }, [selectedPostId]);
+  }, [selectedPostId, posts]);
 
   function onToggleMenu() {
     setIsMenuActive((isMenuActive) => !isMenuActive);
   }
 
   function handleUserSelect(id) {
-    setSelectedUserId(id);
+    if (id === selectedUserId) {
+      setIsMenuActive(false);
+      return;
+    }
+
     setLoading(true);
+    setSelectedUserId(id);
     setError(false);
     setIsMenuActive(false);
+    setSelectedPost(null);
+    setSelectedPostId(null);
   }
 
   function handlePostSelect(id, post) {
@@ -73,6 +82,11 @@ const App = () => {
     setCommentsError(false);
     setSelectedPostId(id);
     setSelectedPost(post);
+    setIsFormVisible(false);
+  }
+
+  function addComment(newComment) {
+    client.post("/comments", newComment).then(() => setComments([...comments, newComment]));
   }
 
   const errorMessage = error && (
@@ -91,7 +105,12 @@ const App = () => {
     <Loader />
   ) : (
     posts.length > 0 && (
-      <PostsList userPosts={posts} onPostSelect={handlePostSelect} selectedPost={selectedPost} />
+      <PostsList
+        userPosts={posts}
+        onPostSelect={handlePostSelect}
+        selectedPostId={selectedPostId}
+        setIsFormVisible={setIsFormVisible}
+      />
     )
   );
 
@@ -110,7 +129,6 @@ const App = () => {
                   selectedUserId={selectedUserId}
                 />
               </div>
-
               <div className="block">
                 {!selectedUserId && <p>No user selected</p>}
                 {errorMessage}
@@ -131,6 +149,10 @@ const App = () => {
                 comments={comments}
                 commentsLoading={commentsLoading}
                 commentsError={commentsError}
+                selectedPostId={selectedPostId}
+                addComment={addComment}
+                isFormVisible={isFormVisible}
+                setIsFormVisible={setIsFormVisible}
               />
             </div>
           </div>

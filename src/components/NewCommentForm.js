@@ -1,7 +1,30 @@
-export const NewCommentForm = () => {
+import { useState } from "react";
+
+export const NewCommentForm = ({ selectedPostId, addComment }) => {
+  const [commentName, setCommentName] = useState("");
+  const [commentEmail, setCommentEmail] = useState("");
+  const [commentText, setCommentText] = useState("");
+
+  function handleInputChange(inputValue, setInputValue) {
+    setInputValue(inputValue);
+  }
+
+  function handleFormSubmit(e, name, email, body) {
+    e.preventDefault();
+
+    const newComment = {
+      postId: selectedPostId,
+      name,
+      email,
+      body,
+    };
+
+    addComment(newComment);
+  }
+
   return (
-    <form data-cy="NewCommentForm">
-      <div className="field" data-cy="NameField">
+    <form onSubmit={(e) => handleFormSubmit(e, commentName, commentEmail, commentText)}>
+      <div className="field">
         <label className="label" htmlFor="comment-author-name">
           Author Name
         </label>
@@ -12,21 +35,24 @@ export const NewCommentForm = () => {
             name="name"
             id="comment-author-name"
             placeholder="Name Surname"
-            className="input is-danger"
+            className="input"
+            value={commentName}
+            onChange={(e) => handleInputChange(e.target.value, setCommentName)}
+            // is-danger
           />
 
           <span className="icon is-small is-left">
             <i className="fas fa-user" />
           </span>
 
-          <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
+          {/* <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
             <i className="fas fa-exclamation-triangle" />
-          </span>
+          </span> */}
         </div>
 
-        <p className="help is-danger" data-cy="ErrorMessage">
+        {/* <p className="help is-danger" data-cy="ErrorMessage">
           Name is required
-        </p>
+        </p> */}
       </div>
 
       <div className="field" data-cy="EmailField">
@@ -40,21 +66,24 @@ export const NewCommentForm = () => {
             name="email"
             id="comment-author-email"
             placeholder="email@test.com"
-            className="input is-danger"
+            className="input"
+            value={commentEmail}
+            onChange={(e) => handleInputChange(e.target.value, setCommentEmail)}
+            // is-danger
           />
 
           <span className="icon is-small is-left">
             <i className="fas fa-envelope" />
           </span>
 
-          <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
+          {/* <span className="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
             <i className="fas fa-exclamation-triangle" />
-          </span>
+          </span> */}
         </div>
 
-        <p className="help is-danger" data-cy="ErrorMessage">
+        {/* <p className="help is-danger" data-cy="ErrorMessage">
           Email is required
-        </p>
+        </p> */}
       </div>
 
       <div className="field" data-cy="BodyField">
@@ -67,18 +96,22 @@ export const NewCommentForm = () => {
             id="comment-body"
             name="body"
             placeholder="Type comment here"
-            className="textarea is-danger"
+            className="textarea"
+            value={commentText}
+            onChange={(e) => handleInputChange(e.target.value, setCommentText)}
+            // is-danger
           />
         </div>
 
-        <p className="help is-danger" data-cy="ErrorMessage">
+        {/* <p className="help is-danger" data-cy="ErrorMessage">
           Enter some text
-        </p>
+        </p> */}
       </div>
 
       <div className="field is-grouped">
         <div className="control">
-          <button type="submit" className="button is-link is-loading">
+          <button type="submit" className="button is-link ">
+            {/* is-loading */}
             Add
           </button>
         </div>
