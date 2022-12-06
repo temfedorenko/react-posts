@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Loader } from "./Loader";
 import { NewCommentForm } from "./NewCommentForm";
 
@@ -12,13 +11,18 @@ export const PostDetails = ({
   addComment,
   setIsFormVisible,
   isFormVisible,
+  deleteComment,
 }) => {
-  const postComments = comments?.map((comment) => {
+  const postComments = comments.map((comment) => {
     return (
       <article className="message is-small" key={comment.id}>
         <div className="message-header">
           <a href={`mailto:${comment.email}`}>{comment.name}</a>
-          <button type="button" className="delete is-small" aria-label="delete">
+          <button
+            type="button"
+            className="delete is-small"
+            aria-label="delete"
+            onClick={() => deleteComment(comment)}>
             delete button
           </button>
         </div>

@@ -85,8 +85,18 @@ const App = () => {
     setIsFormVisible(false);
   }
 
-  function addComment(newComment) {
-    client.post("/comments", newComment).then(() => setComments([...comments, newComment]));
+  function addComment(newComment, setIsFormLoading) {
+    client
+      .post("/comments", newComment)
+      .then((comment) => setComments([...comments, comment]))
+      .catch((err) => console.log(err))
+      .finally(() => setIsFormLoading(false));
+  }
+
+  function deleteComment(comment) {
+    client.delete(`/comments/${comment.id}`).catch((err) => console.log(err));
+
+    setComments(comments.filter((commentItem) => commentItem.id !== comment.id));
   }
 
   const errorMessage = error && (
@@ -153,6 +163,7 @@ const App = () => {
                 addComment={addComment}
                 isFormVisible={isFormVisible}
                 setIsFormVisible={setIsFormVisible}
+                deleteComment={deleteComment}
               />
             </div>
           </div>

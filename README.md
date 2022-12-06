@@ -18,3 +18,16 @@ form to add new comments.
    - the `Loader` is shown before comments are loaded;
    - `CommentsError` notification is show on loading error;
    - `NoComments` message is shown if the post does not have comments yet;
+5. Show the `Write a comment` button below the comments
+   - after click hide the button and show the form to add new comment;
+   - the form stays visible until the other post is opened;
+   - the form should be implemented as a separate component;
+6. The form requires an author's name and email and a comment text.
+   - show errors only after the form is submitted;
+   - remove an error on the field change;
+   - keep the `name` and `email` after the successful submit but clear a comment text;
+   - The `Clear` button should also clear all errors;
+   - Add the `is-loading` class to the submit button while waiting for a response;
+   - Add the new comment received as a response from the `API` to the end of the list;
+7. Implement comment deletion
+   - Delete the commnet immediately not waiting for the server response to improve the UX.
